@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.react-archer-container svg defs marker,
+.react-archer-container svg path marker {
+  display: none !important;
+}
