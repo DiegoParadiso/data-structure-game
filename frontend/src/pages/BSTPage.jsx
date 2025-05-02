@@ -1,151 +1,52 @@
-import React, { useState, useEffect  } from 'react';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { ArcherContainer, ArcherElement } from 'react-archer';
+import { ArcherContainer } from 'react-archer';
 
-// Función para generar números aleatorios únicos
-function generateRandomNumbers(size, min, max) {
-  const numbers = new Set();
-  while (numbers.size < size) {
-    const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-    numbers.add(randomNum);
-  }
-  return [...numbers];
-}
-
-// Nodo arrastrable
-function DraggableNode({ value, isEnabled }) {
-  const [{ isDragging }, drag] = useDrag({
-    type: 'NODE',
-    item: { value },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  });
-
-  return (
-
-    <div
-      ref={drag}
-      className={`p-2 m-1 border rounded-full text-center cursor-move bg-white ${isDragging ? 'opacity-50' : ''} ${
-        !isEnabled ? 'opacity-30 cursor-not-allowed' : ''
-      }`}
-      style={{
-        width: '3rem',
-        height: '3rem',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: '1rem',
-        cursor: isDragging ? 'grabbing' : 'grab',
-        backgroundColor: isDragging ? '#e0e0e0' : '#FFFFFF',
-      }}
-    >
-      {value}
-    </div>
-  );
-}
-
-// Zona de drop
-function DropZone({ onDrop, isEnabled }) {
-  const [{ canDrop, isOver }, drop] = useDrop({
-    accept: 'NODE',
-    drop: (item) => onDrop(item.value),
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-      canDrop: !!monitor.canDrop(),
-    }),
-  });
-
-  const active = canDrop && isOver;
-
-  return (
-    
-    <div
-      ref={drop}
-      className={`w-16 h-16 border-2 border-dashed rounded-full flex items-center justify-center ${
-        active ? 'bg-gray-200' : 'bg-gray-100'
-      } ${!isEnabled && 'cursor-not-allowed'}`}
-    ></div>
-  );
-}
-
-// Árbol usando ArcherElement para las conexiones sin flechas
-function TreeNode({ node, onAddChild, depth = 0 }) {
-  // Definimos las relaciones (conexiones) para cada hijo
-  const relations = [];
-  if (node.left) {
-    relations.push({
-      targetId: `node-${node.left.value}`,
-      targetAnchor: 'top',
-      sourceAnchor: 'bottom',
-      style: { endMarker: false },
-    });
-  }
-  if (node.right) {
-    relations.push({
-      targetId: `node-${node.right.value}`,
-      targetAnchor: 'top',
-      sourceAnchor: 'bottom',
-      style: { endMarker: false },
-    });
-  }
-
-  return (
-    <div className="relative flex flex-col items-center">
-      <ArcherElement id={`node-${node.value}`} relations={relations}>
-        <div
-          className="flex items-center justify-center"
-          style={{
-            width: '48px',
-            height: '48px',
-            border: '2px solid #ccc',
-            borderRadius: '50%',
-            background: 'white',
-            textAlign: 'center',
-            zIndex: 10,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-            marginBottom: '16px',
-          }}
-        >
-          {node.value}
-        </div>
-      </ArcherElement>
-      <div className="flex justify-between w-full" style={{ minWidth: '80px', marginTop: '8px' }}>
-        <div className="flex flex-col items-center">
-          {node.left ? (
-            <TreeNode node={node.left} onAddChild={onAddChild} depth={depth + 1} />
-          ) : (
-            <DropZone onDrop={(val) => onAddChild(node.value, 'left', val)} isEnabled={depth < 3} />
-          )}
-        </div>
-        <div className="flex flex-col items-center">
-          {node.right ? (
-            <TreeNode node={node.right} onAddChild={onAddChild} depth={depth + 1} />
-          ) : (
-            <DropZone onDrop={(val) => onAddChild(node.value, 'right', val)} isEnabled={depth < 3} />
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+import Timer from '../components/Timer'; // Importa el Timer basado en react-timer-hook
+import DraggableNode from '../components/DraggableNode';
+import DropZone from '../components/DropZone';
+import TreeNode from '../components/TreeNode';
+import CustomDragLayer from '../components/CustomDragLayer';
+import { generateRandomNumbers, isBST } from '../utils/bstHelpers';
 
 function BSTGame() {
+  const { state } = useLocation();
+  const { mode, timer } = state || {};
   const [available, setAvailable] = useState(() => generateRandomNumbers(7, 10, 100));
   const [tree, setTree] = useState(null);
   const [message, setMessage] = useState('');
   const [enabledIndex, setEnabledIndex] = useState(0);
+  const [expiryTimestamp, setExpiryTimestamp] = useState(null);
+  const [isGameOver, setIsGameOver] = useState(false); // Nueva variable de estado para manejar el bloqueo
 
+  // Configura la fecha de expiración del timer según el valor recibido
   useEffect(() => {
-    const markers = document.querySelectorAll('.react-archer-container marker');
-    markers.forEach((marker) => {
-      marker.style.display = 'none';
-    });
-  }, []);
+    let secondsToAdd = 0;
+    if (timer === '40s') {
+      secondsToAdd = 40;
+    } else if (timer === '20s') {
+      secondsToAdd = 20;
+    } else if (timer === '10s') {
+      secondsToAdd = 10;
+    }
+    if (secondsToAdd > 0) {
+      const time = new Date();
+      time.setSeconds(time.getSeconds() + secondsToAdd);
+      setExpiryTimestamp(time);
+    }
+  }, [timer]);
 
-  // Agrega un hijo en la dirección indicada (izquierda o derecha)
+  // Función que se invoca al expirar el timer
+  const handleTimeUp = () => {
+    setIsGameOver(true); // Bloquea el juego cuando el tiempo se acaba
+    setMessage('¡El tiempo se acabó! No pudiste completar el árbol en el tiempo asignado.');
+  };
+
   const handleAddChild = (parentVal, side, childVal) => {
+    if (isGameOver) return; // No permite añadir nodos si el tiempo se acabó
+
     const addNode = (current) => {
       if (!current) return null;
       if (current.value === parentVal) {
@@ -165,19 +66,11 @@ function BSTGame() {
     setEnabledIndex((prev) => prev + 1);
   };
 
-  // Agrega la raíz del árbol
   const handleAddRoot = (val) => {
+    if (isGameOver) return; // No permite añadir el nodo raíz si el tiempo se acabó
+
     setTree({ value: val, left: null, right: null });
     setEnabledIndex((prev) => prev + 1);
-  };
-
-  // Función para verificar si el árbol es un BST válido mediante recorrido in-order
-  const isBST = (node, prev = { value: -Infinity }) => {
-    if (!node) return true;
-    if (!isBST(node.left, prev)) return false;
-    if (node.value <= prev.value) return false;
-    prev.value = node.value;
-    return isBST(node.right, prev);
   };
 
   const handleVerify = () => {
@@ -187,19 +80,33 @@ function BSTGame() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      <CustomDragLayer />
       <div className="flex flex-col items-center p-4 space-y-4">
+        <div className="text-center mb-4">
+          <p className="pt-3 text-xl">
+            Modo de juego: {mode} | Temporizador: {timer}
+          </p>
+        </div>
+
+        {/* Muestra el Timer solo si se ha seleccionado un temporizador */}
+        {timer !== 'noTimer' && expiryTimestamp && (
+          <Timer expiryTimestamp={expiryTimestamp} onExpire={handleTimeUp} />
+        )}
+
         <div className="w-full max-w-4xl flex space-x-4">
-          {/* Sección de Nodos */}
           <div className="w-full sm:w-1/3 md:w-1/4 p-2 border rounded bg-gray-50 h-[300px]">
             <h2 className="font-bold mb-2">Nodos:</h2>
             <div className="flex flex-wrap justify-center">
               {available.map((val, index) => (
-                <DraggableNode key={val} value={val} isEnabled={index === enabledIndex} />
+                <DraggableNode
+                  key={val}
+                  value={val}
+                  isEnabled={index === enabledIndex && !isGameOver} // Deshabilita el nodo si el juego está bloqueado
+                />
               ))}
             </div>
           </div>
 
-          {/* Árbol en construcción */}
           <div className="w-full sm:w-2/3 md:w-3/4 p-2 border rounded bg-gray-50">
             <h2 className="font-bold mb-2">Construcción de árbol:</h2>
             <div className="flex justify-center">
@@ -207,32 +114,26 @@ function BSTGame() {
                 {tree ? (
                   <TreeNode node={tree} onAddChild={handleAddChild} />
                 ) : (
-                  <DropZone onDrop={handleAddRoot} isEnabled={enabledIndex < 1} />
+                  <DropZone onDrop={handleAddRoot} isEnabled={!isGameOver} />
                 )}
               </ArcherContainer>
             </div>
           </div>
         </div>
 
-        {/* Botón de verificación */}
         <div className="mt-4 flex items-center justify-center">
           <button
             onClick={handleVerify}
-            disabled={!tree || enabledIndex < 7}
-            className={`px-6 py-2 rounded text-white ${
-              !tree || enabledIndex < 7 ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-600 hover:bg-gray-700'
-            }`}
+            disabled={!tree || enabledIndex < 7 || isGameOver} // Deshabilita el botón si el juego está bloqueado
+            className={`px-6 py-2 rounded text-white ${(!tree || enabledIndex < 7 || isGameOver) ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-600 hover:bg-gray-700'}`}
           >
             Verificar
           </button>
         </div>
 
-        {/* Mensaje de resultado */}
         {message && (
           <div className="mt-4 flex items-center justify-center">
-            <span className={`font-semibold ${
-              message.includes('correcto') ? 'text-green-700' : 'text-red-700'
-            }`}>
+            <span className={`font-semibold ${message.includes('correcto') ? 'text-green-700' : 'text-red-700'}`}>
               {message}
             </span>
           </div>

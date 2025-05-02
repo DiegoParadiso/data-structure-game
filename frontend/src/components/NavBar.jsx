@@ -6,7 +6,7 @@ import { assets } from '../assets/assets';
 
 const Navbar = () => {
   return (
-    <nav className="bg-gray-500 text-white p-4 relative flex items-center justify-center shadow-lg">
+    <nav className="bg-gray-600 text-white p-4 relative flex items-center justify-center shadow-lg">
       {/* Iconos a la izquierda, cerca del centro */}
       <div className="absolute left-1/4 -translate-x-1/2 flex items-center space-x-3 z-10">
         <Link to="/how-to-play" className="hover:text-yellow-300">

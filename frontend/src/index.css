@@ -6,3 +6,7 @@
 .react-archer-container svg path marker {
   display: none !important;
 }
+
+*[draggable="true"] {
+  cursor: default !important;
+}
