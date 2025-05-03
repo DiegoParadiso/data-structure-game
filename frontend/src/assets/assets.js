@@ -1,7 +1,7 @@
 import arbol from './arbol.png'
-import gamelogo from './gamelogo.png'
+import logoSIT from './logoSIT.png'
 
 export const assets = {
     arbol,
-    gamelogo
+    logoSIT
     }

@@ -10,3 +10,23 @@
 *[draggable="true"] {
   cursor: default !important;
 }
+
+@keyframes bg-flash-green {
+  0% { background-color: white; }
+  50% { background-color: #d1fae5; } /* Verde más tenue */
+  100% { background-color: white; }
+}
+
+@keyframes bg-flash-red {
+  0% { background-color: white; }
+  50% { background-color: #ffb4b4; } /* Tailwind's red-300 */
+  100% { background-color: white; }
+}
+
+.bg-flash-green {
+  animation: bg-flash-green 0.70s ease-in-out;
+}
+
+.bg-flash-red {
+  animation: bg-flash-red 0.70s ease-in-out;
+}

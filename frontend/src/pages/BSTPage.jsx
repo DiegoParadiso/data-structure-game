@@ -4,7 +4,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ArcherContainer } from 'react-archer';
 
-import Timer from '../components/Timer'; // Importa el Timer basado en react-timer-hook
+import Timer from '../components/Timer';
 import DraggableNode from '../components/DraggableNode';
 import DropZone from '../components/DropZone';
 import TreeNode from '../components/TreeNode';
@@ -13,131 +13,152 @@ import { generateRandomNumbers, isBST } from '../utils/bstHelpers';
 
 function BSTGame() {
   const { state } = useLocation();
-  const { mode, timer } = state || {};
-  const [available, setAvailable] = useState(() => generateRandomNumbers(7, 10, 100));
+  const { mode = 'normal', timer } = state || {};
+
+  const [available, setAvailable] = useState([]);
   const [tree, setTree] = useState(null);
   const [message, setMessage] = useState('');
   const [enabledIndex, setEnabledIndex] = useState(0);
   const [expiryTimestamp, setExpiryTimestamp] = useState(null);
-  const [isGameOver, setIsGameOver] = useState(false); // Nueva variable de estado para manejar el bloqueo
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [gameStatus, setGameStatus] = useState(null); 
 
-  // Configura la fecha de expiración del timer según el valor recibido
+  // Configurar nodos iniciales en base al modo
   useEffect(() => {
-    let secondsToAdd = 0;
-    if (timer === '40s') {
-      secondsToAdd = 40;
-    } else if (timer === '20s') {
-      secondsToAdd = 20;
-    } else if (timer === '10s') {
-      secondsToAdd = 10;
-    }
+    let count = 7;
+
+    if (mode === 'easy') count = 5;
+    else if (mode === 'hard') count = 9;
+
+    const generated = generateRandomNumbers(count, 1, 99);
+    setAvailable(generated);
+  }, [mode]);
+
+  // Configura el temporizador si se selecciona uno
+  useEffect(() => {
+    const timeMapping = { '40s': 40, '20s': 20, '10s': 10 };
+    const secondsToAdd = timeMapping[timer] || 0;
+
     if (secondsToAdd > 0) {
-      const time = new Date();
-      time.setSeconds(time.getSeconds() + secondsToAdd);
-      setExpiryTimestamp(time);
+      const expiry = new Date();
+      expiry.setSeconds(expiry.getSeconds() + secondsToAdd);
+      setExpiryTimestamp(expiry);
     }
   }, [timer]);
 
-  // Función que se invoca al expirar el timer
   const handleTimeUp = () => {
-    setIsGameOver(true); // Bloquea el juego cuando el tiempo se acaba
-    setMessage('¡El tiempo se acabó! No pudiste completar el árbol en el tiempo asignado.');
+    setIsGameOver(true);
+    setGameStatus("fail"); // Marca como "fail" si se acaba el tiempo
+    setMessage('¡El tiempo se acabó!');
   };
 
   const handleAddChild = (parentVal, side, childVal) => {
-    if (isGameOver) return; // No permite añadir nodos si el tiempo se acabó
+    if (isGameOver) return;
 
-    const addNode = (current) => {
-      if (!current) return null;
-      if (current.value === parentVal) {
-        if (side === 'left' && !current.left) {
-          current.left = { value: childVal, left: null, right: null };
-        }
-        if (side === 'right' && !current.right) {
-          current.right = { value: childVal, left: null, right: null };
-        }
+    const addNode = (node) => {
+      if (!node) return null;
+
+      if (node.value === parentVal) {
+        if (side === 'left' && !node.left) node.left = { value: childVal, left: null, right: null };
+        if (side === 'right' && !node.right) node.right = { value: childVal, left: null, right: null };
       } else {
-        if (current.left) addNode(current.left);
-        if (current.right) addNode(current.right);
+        node.left && addNode(node.left);
+        node.right && addNode(node.right);
       }
-      return current;
+      return node;
     };
+
     setTree((prev) => addNode({ ...prev }));
     setEnabledIndex((prev) => prev + 1);
   };
 
   const handleAddRoot = (val) => {
-    if (isGameOver) return; // No permite añadir el nodo raíz si el tiempo se acabó
-
+    if (isGameOver) return;
     setTree({ value: val, left: null, right: null });
-    setEnabledIndex((prev) => prev + 1);
+    setEnabledIndex(1);
   };
 
   const handleVerify = () => {
-    const isCorrect = isBST(tree);
-    setMessage(isCorrect ? '¡El árbol es correcto!' : 'El árbol NO es un BST correcto.');
+    const correct = isBST(tree);
+    setIsGameOver(true);
+    setGameStatus(correct ? "success" : "fail"); 
+    setMessage(correct ? '¡El árbol es correcto!' : 'El árbol NO es un BST correcto.');
   };
+
+  const isVerifyDisabled = !tree || enabledIndex < available.length || isGameOver;
 
   return (
     <DndProvider backend={HTML5Backend}>
       <CustomDragLayer />
-      <div className="flex flex-col items-center p-4 space-y-4">
-        <div className="text-center mb-4">
-          <p className="pt-3 text-xl">
-            Modo de juego: {mode} | Temporizador: {timer}
-          </p>
-        </div>
+      <div className={`transition-colors duration-700 min-h-screen ${
+        gameStatus === "success" ? "bg-flash-green" : gameStatus === "fail" ? "bg-flash-red" : "bg-white"
+      }`}>
+        <div className="flex flex-col items-center p-4 space-y-4">
+          {timer !== 'noTimer' && expiryTimestamp && (
+            <Timer
+              expiryTimestamp={expiryTimestamp}
+              onExpire={handleTimeUp}
+              stopTimer={isGameOver}
+            />
+          )}
 
-        {/* Muestra el Timer solo si se ha seleccionado un temporizador */}
-        {timer !== 'noTimer' && expiryTimestamp && (
-          <Timer expiryTimestamp={expiryTimestamp} onExpire={handleTimeUp} />
-        )}
+          {/* Contenedor principal */}
+          <div className="w-full max-w-6xl flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-4">
+            
+            {/* Panel lateral: nodos + botón */}
+            <div className="flex flex-col w-full md:w-[20%]">
+              <div className="p-2 border rounded bg-gray-50 h-[300px]">
+                <h2 className="font-bold mb-2">Nodos:</h2>
+                <div className="flex flex-wrap justify-center">
+                  {available.map((val, index) => (
+                    <DraggableNode
+                      key={val}
+                      value={val}
+                      isEnabled={index === enabledIndex && !isGameOver}
+                    />
+                  ))}
+                </div>
+              </div>
 
-        <div className="w-full max-w-4xl flex space-x-4">
-          <div className="w-full sm:w-1/3 md:w-1/4 p-2 border rounded bg-gray-50 h-[300px]">
-            <h2 className="font-bold mb-2">Nodos:</h2>
-            <div className="flex flex-wrap justify-center">
-              {available.map((val, index) => (
-                <DraggableNode
-                  key={val}
-                  value={val}
-                  isEnabled={index === enabledIndex && !isGameOver} // Deshabilita el nodo si el juego está bloqueado
-                />
-              ))}
+              <div className="mt-4 flex items-center justify-center">
+                <button
+                  onClick={handleVerify}
+                  disabled={isVerifyDisabled}
+                  className={`w-full px-4 py-2 rounded text-white ${
+                    isVerifyDisabled
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-gray-600 hover:bg-gray-700'
+                  }`}
+                >
+                  Verificar
+                </button>
+              </div>
+                  
+              {/* Mensaje final */}
+              {message && (
+                <div className="mt-4 flex items-center justify-center">
+                  <span className={`font-semibold ${gameStatus === "fail" ? "text-red-700" : "text-green-700"}`}>
+                    {message}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Árbol */}
+            <div className="w-full md:w-[80%] p-2 border rounded bg-gray-50 min-h-[500px]">
+              <h2 className="font-bold mb-2">Construcción del árbol:</h2>
+              <div className="flex justify-center">
+                <ArcherContainer strokeColor="gray" strokeWidth={2}>
+                  {tree ? (
+                    <TreeNode node={tree} onAddChild={handleAddChild} />
+                  ) : (
+                    <DropZone onDrop={handleAddRoot} isEnabled={!isGameOver} />
+                  )}
+                </ArcherContainer>
+              </div>
             </div>
           </div>
-
-          <div className="w-full sm:w-2/3 md:w-3/4 p-2 border rounded bg-gray-50">
-            <h2 className="font-bold mb-2">Construcción de árbol:</h2>
-            <div className="flex justify-center">
-              <ArcherContainer strokeColor="gray" strokeWidth={2}>
-                {tree ? (
-                  <TreeNode node={tree} onAddChild={handleAddChild} />
-                ) : (
-                  <DropZone onDrop={handleAddRoot} isEnabled={!isGameOver} />
-                )}
-              </ArcherContainer>
-            </div>
-          </div>
         </div>
-
-        <div className="mt-4 flex items-center justify-center">
-          <button
-            onClick={handleVerify}
-            disabled={!tree || enabledIndex < 7 || isGameOver} // Deshabilita el botón si el juego está bloqueado
-            className={`px-6 py-2 rounded text-white ${(!tree || enabledIndex < 7 || isGameOver) ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-600 hover:bg-gray-700'}`}
-          >
-            Verificar
-          </button>
-        </div>
-
-        {message && (
-          <div className="mt-4 flex items-center justify-center">
-            <span className={`font-semibold ${message.includes('correcto') ? 'text-green-700' : 'text-red-700'}`}>
-              {message}
-            </span>
-          </div>
-        )}
       </div>
     </DndProvider>
   );

@@ -14,9 +14,7 @@ const GameModeSelection = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center px-4">
-      <h2 className="pt-20 pb-6 text-xl text-center font-medium text-gray-800">Selecciona tu Modo de Juego</h2>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-md">
+      <div className="pt-20 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-md">
         {/* Dificultad */}
         <div className="p-4 border rounded-lg shadow-md">
           <div>

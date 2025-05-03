@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 
-const Timer = ({ expiryTimestamp, onTimeUp }) => {
-  const { seconds, minutes, hours, isRunning, start, pause, resume, restart } = useTimer({
+const Timer = ({ expiryTimestamp, onExpire, stopTimer }) => {
+  const { seconds, minutes, hours, pause } = useTimer({
     expiryTimestamp,
-    onExpire: onTimeUp,
+    onExpire,
   });
+
+  // Si stopTimer es true, pausa el cronómetro
+  useEffect(() => {
+    if (stopTimer) {
+      pause();
+    }
+  }, [stopTimer, pause]);
 
   return (
     <div className="text-center">
