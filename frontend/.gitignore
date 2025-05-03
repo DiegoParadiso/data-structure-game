@@ -10,8 +10,7 @@
 
 # production
 /build
-# Ignorar los archivos de lock de npm y yarn
-package-lock.json
+
 # misc
 .DS_Store
 .env.local
