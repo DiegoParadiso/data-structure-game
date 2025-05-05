@@ -2,9 +2,11 @@ import React from 'react';
 import { ArcherElement } from 'react-archer';
 import DropZone from './DropZone';
 
-// Árbol usando ArcherElement para las conexiones sin flechas
-function TreeNode({ node, onAddChild, depth = 0 }) {
-    
+function TreeNode({ node, onAddChild, errorNode, depth = 0 }) {
+  // Comprobamos si este es el nodo incorrecto
+  const isErrorNode = errorNode && errorNode.value === node.value;
+  
+
   // Definimos las relaciones (conexiones) para cada hijo
   const relations = [];
   if (node.left) {
@@ -28,11 +30,11 @@ function TreeNode({ node, onAddChild, depth = 0 }) {
     <div className="relative flex flex-col items-center">
       <ArcherElement id={`node-${node.value}`} relations={relations}>
         <div
-          className="flex items-center justify-center"
+          className={`flex items-center justify-center ${isErrorNode ? 'border-red-500 bg-red-100' : 'border-gray-300'}`}
           style={{
             width: '48px',
             height: '48px',
-            border: '2px solid #ccc',
+            border: '2px solid',
             borderRadius: '50%',
             background: 'white',
             textAlign: 'center',
@@ -47,14 +49,14 @@ function TreeNode({ node, onAddChild, depth = 0 }) {
       <div className="flex justify-between w-full" style={{ minWidth: '80px', marginTop: '8px' }}>
         <div className="flex flex-col items-center">
           {node.left ? (
-            <TreeNode node={node.left} onAddChild={onAddChild} depth={depth + 1} />
+            <TreeNode node={node.left} onAddChild={onAddChild} errorNode={errorNode} depth={depth + 1} />
           ) : (
             <DropZone onDrop={(val) => onAddChild(node.value, 'left', val)} isEnabled={depth < 3} />
           )}
         </div>
         <div className="flex flex-col items-center">
           {node.right ? (
-            <TreeNode node={node.right} onAddChild={onAddChild} depth={depth + 1} />
+            <TreeNode node={node.right} onAddChild={onAddChild} errorNode={errorNode} depth={depth + 1} />
           ) : (
             <DropZone onDrop={(val) => onAddChild(node.value, 'right', val)} isEnabled={depth < 3} />
           )}
@@ -63,4 +65,5 @@ function TreeNode({ node, onAddChild, depth = 0 }) {
     </div>
   );
 }
+
 export default TreeNode;

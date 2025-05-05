@@ -1,13 +1,22 @@
+export const isBST = (node, prev = { value: -Infinity }, errorNode = null) => {
+  if (!node) return { isValid: true, errorNode };
 
-  // Función para verificar si el árbol es un BST válido mediante recorrido in-order
-  const isBST = (node, prev = { value: -Infinity }) => {
-    if (!node) return true;
-    if (!isBST(node.left, prev)) return false;
-    if (node.value <= prev.value) return false;
-    prev.value = node.value;
-    return isBST(node.right, prev);
-  };
+  // Verificar el subárbol izquierdo
+  const leftCheck = isBST(node.left, prev, errorNode);
+  if (!leftCheck.isValid) return leftCheck;  // Si es inválido, devolver el error
 
+  // Verificar si el valor actual es mayor que el anterior
+  if (node.value <= prev.value) {
+    // Si no es válido, actualizar errorNode con el nodo actual
+    errorNode = node;
+    return { isValid: false, errorNode };
+  }
+
+  prev.value = node.value; // Actualizamos el valor previo
+
+  // Verificar el subárbol derecho
+  return isBST(node.right, prev, errorNode);
+};
   
 // Función para generar números aleatorios únicos
 function generateRandomNumbers(size, min, max) {
@@ -19,4 +28,4 @@ function generateRandomNumbers(size, min, max) {
     return [...numbers];
   }
 
-  export { generateRandomNumbers, isBST };
+  export { generateRandomNumbers };

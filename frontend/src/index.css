@@ -13,13 +13,13 @@
 
 @keyframes bg-flash-green {
   0% { background-color: white; }
-  50% { background-color: #d1fae5; } /* Verde más tenue */
+  50% { background-color: #abffd4; } /* Verde más tenue */
   100% { background-color: white; }
 }
 
 @keyframes bg-flash-red {
   0% { background-color: white; }
-  50% { background-color: #ffb4b4; } /* Tailwind's red-300 */
+  50% { background-color: #ff8d8d; } /* Tailwind's red-300 */
   100% { background-color: white; }
 }
 

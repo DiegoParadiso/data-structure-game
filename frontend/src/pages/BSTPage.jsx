@@ -22,13 +22,14 @@ function BSTGame() {
   const [expiryTimestamp, setExpiryTimestamp] = useState(null);
   const [isGameOver, setIsGameOver] = useState(false);
   const [gameStatus, setGameStatus] = useState(null); 
+  const [errorNode, setErrorNode] = useState(null);
 
   // Configurar nodos iniciales en base al modo
   useEffect(() => {
-    let count = 7;
+    let count = 8;
 
     if (mode === 'easy') count = 5;
-    else if (mode === 'hard') count = 9;
+    else if (mode === 'hard') count = 10;
 
     const generated = generateRandomNumbers(count, 1, 99);
     setAvailable(generated);
@@ -36,7 +37,7 @@ function BSTGame() {
 
   // Configura el temporizador si se selecciona uno
   useEffect(() => {
-    const timeMapping = { '40s': 40, '20s': 20, '10s': 10 };
+    const timeMapping = { '35s': 35, '20s': 20, '15s': 15 };
     const secondsToAdd = timeMapping[timer] || 0;
 
     if (secondsToAdd > 0) {
@@ -78,11 +79,16 @@ function BSTGame() {
     setEnabledIndex(1);
   };
 
-  const handleVerify = () => {
-    const correct = isBST(tree);
+const handleVerify = () => {
+    const { isValid, errorNode } = isBST(tree); // Usamos la versión modificada de isBST
+    
     setIsGameOver(true);
-    setGameStatus(correct ? "success" : "fail"); 
-    setMessage(correct ? '¡El árbol es correcto!' : 'El árbol NO es un BST correcto.');
+    setGameStatus(isValid ? "success" : "fail");
+    setMessage(isValid ? '¡El árbol es correcto!' : 'El árbol NO es un BST correcto.');
+
+    if (!isValid && errorNode) {
+      setErrorNode(errorNode); // Guardamos el nodo incorrecto
+    }
   };
 
   const isVerifyDisabled = !tree || enabledIndex < available.length || isGameOver;

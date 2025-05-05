@@ -49,10 +49,10 @@ const GameModeSelection = () => {
               Sin Temporizador
             </button>
             <button
-              onClick={() => setTimer('40s')}
-              className={`p-2 w-full ${timer === '40s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded mb-2`}
+              onClick={() => setTimer('35s')}
+              className={`p-2 w-full ${timer === '35s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded mb-2`}
             >
-              40 segundos
+              35 segundos
             </button>
             <button
               onClick={() => setTimer('20s')}
@@ -61,10 +61,10 @@ const GameModeSelection = () => {
               20 segundos
             </button>
             <button
-              onClick={() => setTimer('10s')}
-              className={`p-2 w-full ${timer === '10s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded`}
+              onClick={() => setTimer('15s')}
+              className={`p-2 w-full ${timer === '15s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded`}
             >
-              10 segundos
+              15 segundos
             </button>
           </div>
         </div>
