@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.e9798bd4.css",
+    "main.js": "/static/js/main.e7846e1d.js",
+    "static/js/453.8ab44547.chunk.js": "/static/js/453.8ab44547.chunk.js",
+    "static/media/logoSIT.png": "/static/media/logoSIT.98ba97810192e4cbf318.png",
+    "index.html": "/index.html",
+    "main.e9798bd4.css.map": "/static/css/main.e9798bd4.css.map",
+    "main.e7846e1d.js.map": "/static/js/main.e7846e1d.js.map",
+    "453.8ab44547.chunk.js.map": "/static/js/453.8ab44547.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e9798bd4.css",
+    "static/js/main.e7846e1d.js"
+  ]
+}
