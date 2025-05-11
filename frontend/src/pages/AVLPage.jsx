@@ -17,10 +17,7 @@ function HashingGame() {
   const [gameStatus, setGameStatus] = useState(null);
 
   useEffect(() => {
-    // Generar números aleatorios entre 0 y 15 (puedes ajustar el rango según tus necesidades)
-    const generated = generateRandomNumbers(8, 0, 15).map(num => ({
-      decimal: num, // Guardamos el número decimal
-    }));
+    const generated = generateRandomNumbers(8, 0, 15).map(num => ({ decimal: num }));
     setAvailable(generated);
   }, []);
 
@@ -35,14 +32,12 @@ function HashingGame() {
 
     setEnabledIndex(prev => prev + 1);
   };
-  // Definimos la función splitBucket, que se encarga de dividir un bucket lleno.
+
   const splitBucket = (bucketId) => {
     setBuckets(prev => {
       const items = prev[bucketId];
-      // Ejemplo: se crean dos nuevos buckets con clave bucketId+'0' y bucketId+'1'
       const newKey0 = bucketId + '0';
       const newKey1 = bucketId + '1';
-      // Distribuimos los elementos: si son pares van a newKey0, impares a newKey1 (puedes ajustar el criterio)
       const bucket0 = items.filter(val => val % 2 === 0);
       const bucket1 = items.filter(val => val % 2 !== 0);
       const newBuckets = { ...prev };
@@ -52,12 +47,20 @@ function HashingGame() {
       return newBuckets;
     });
   };
+
+  const extendBucket = (bucketId) => {
+    setBuckets(prev => {
+      const newBucket = prev[bucketId];
+      const newSize = newBucket.length * 2;
+      const extendedBucket = [...newBucket, ...Array(newSize - newBucket.length).fill(null)];
+      return { ...prev, [bucketId]: extendedBucket };
+    });
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
-          <CustomDragLayer />
+      <CustomDragLayer />
       <div className="flex flex-col items-center p-4 space-y-4">
-        {/* TIMER */}
-
         {/* Contenedor principal */}
         <div className="w-full max-w-6xl flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-4">
           
@@ -67,34 +70,17 @@ function HashingGame() {
               <h2 className="font-bold mb-2">Nodos:</h2>
               <div className="flex flex-wrap justify-center">
                 {available.map((val, index) => (
-                  <DraggableNode
-                    key={val.decimal} // Usamos el valor decimal para la clave
-                    value={val.decimal} // Mostramos el valor decimal
-                    isEnabled={index === enabledIndex && !isGameOver}
-                  />
+                  <DraggableNode key={val.decimal} value={val.decimal} isEnabled={index === enabledIndex && !isGameOver} />
                 ))}
               </div>
             </div>
-
-            <div className="mt-4 flex items-center justify-center">
-              <button>Verificar</button>
-            </div>
-
-            {/* Mensaje final */}
-            {message && (
-              <div className="mt-4 flex items-center justify-center">
-                <span className={`font-semibold ${gameStatus === "fail" ? "text-red-700" : "text-green-700"}`}>
-                  {message}
-                </span>
-              </div>
-            )}
           </div>
 
           {/* HashingZone */}
           <div className="w-full md:w-[80%] p-2 border rounded bg-gray-50 min-h-[500px]">
             <h2 className="font-bold mb-2">Construcción de Hashing:</h2>
             <ArcherContainer strokeColor="black" strokeWidth={2}>
-<HashingZone key="hashing-zone" buckets={buckets} handleDrop={handleDrop} splitBucket={splitBucket} />
+              <HashingZone key="hashing-zone" buckets={buckets} handleDrop={handleDrop} splitBucket={splitBucket} extendBucket={extendBucket} />
             </ArcherContainer>
           </div>
         </div>
