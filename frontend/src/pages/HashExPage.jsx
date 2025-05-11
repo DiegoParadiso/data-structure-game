@@ -4,7 +4,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ArcherContainer, ArcherElement } from 'react-archer';
 import DraggableNode from '../components/DraggableNode';
 import HashingZone from '../components/HashingZone';
-import { generateRandomNumbers } from '../utils/bstHelpers';
+import { generateRandomNumbers } from '../utils/Helpers';
 import CustomDragLayer from '../components/CustomDragLayer';
 import Timer from '../components/Timer';
 

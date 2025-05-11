@@ -33,10 +33,11 @@ const Home = () => {
         {/* Box 2 */}
         <div
           className="bg-white shadow-lg rounded-xl p-4 flex flex-col justify-between items-center h-52 cursor-pointer"
+          onClick={() => handleRedirect('/ejercicio/hashingex')}
         >
           <img src={assets.arbol} alt="Árbol AVL" className="w-20 h-20" />
           <p className="text-sm text-center font-medium text-gray-800">
-            Árbol Binario Balanceado (AVL)
+            Hash Extensible
           </p>
         </div>
 

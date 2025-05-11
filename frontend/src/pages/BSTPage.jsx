@@ -9,7 +9,7 @@ import DraggableNode from '../components/DraggableNode';
 import DropZone from '../components/DropZone';
 import TreeNode from '../components/TreeNode';
 import CustomDragLayer from '../components/CustomDragLayer';
-import { generateRandomNumbers, isBST } from '../utils/bstHelpers';
+import { generateRandomNumbers, isBST } from '../utils/Helpers';
 
 function BSTGame() {
   const { state } = useLocation();
