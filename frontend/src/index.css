@@ -32,6 +32,7 @@
     animation: subtleMove 15s ease infinite;
   }
 }
+
 .react-archer-container svg defs marker,
 .react-archer-container svg path marker {
   display: none !important;

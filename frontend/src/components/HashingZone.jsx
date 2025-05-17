@@ -1,8 +1,8 @@
-import React from 'react';
+import React from 'react'; 
 import { useDrop } from 'react-dnd';
 import { ArcherContainer, ArcherElement } from 'react-archer';
 
-const HashingZone = ({ buckets, handleDrop, splitBucket, extendBucket }) => {
+const HashingZone = ({ buckets, onDrop, splitBucket, extendBucket }) => {
   const indexLabels = Object.keys(buckets).sort();
 
   return (
@@ -25,7 +25,9 @@ const HashingZone = ({ buckets, handleDrop, splitBucket, extendBucket }) => {
                 ]}
               >
                 <div
-                  className={`w-12 h-12 flex items-center justify-center bg-blue-200 text-xs font-bold ${i !== 0 ? 'border-t border-blue-400' : ''}`}
+                  className={`w-12 h-12 flex items-center justify-center bg-blue-200 text-xs font-bold ${
+                    i !== 0 ? 'border-t border-blue-400' : ''
+                  }`}
                 >
                   {idx}
                 </div>
@@ -35,63 +37,74 @@ const HashingZone = ({ buckets, handleDrop, splitBucket, extendBucket }) => {
 
           {/* Buckets */}
           <div className="flex flex-col items-center gap-4">
-            {indexLabels.map((bucketId) => (
-              <div className="flex flex-col" key={`bucket-row-${bucketId}`}>
+            {indexLabels.map((bucketId) => {
+              const currentBucket = buckets[bucketId] || [];
+              const safeFillCount = Math.max(0, 4 - currentBucket.length);
+              const filledBucket = [...currentBucket, ...Array(safeFillCount).fill(null)];
+              const firstEmptyIndex = filledBucket.findIndex(val => val === null);
+              const isFull = currentBucket.length === 4 && !currentBucket.includes(null);
 
-                {/* Solapa con la profundidad, ubicada a la derecha del contenedor del bucket */}
-                <div className="text-xs text-gray-600 flex justify-end">
-                  <div className="bg-blue-200 text-white px-2 py-0.5">
-                    {bucketId.length}
+              return (
+                <div className="flex flex-col" key={`bucket-row-${bucketId}`}>
+                  {/* Solapa con la profundidad */}
+                  <div className="text-xs text-gray-600 flex justify-end">
+                    <div className="bg-blue-200 text-white px-2 py-0.5">
+                      {bucketId.length}
+                    </div>
                   </div>
-                </div>
 
-                {/* Contenedor completo del bucket */}
-                <div className="flex flex-col w-fit space-y-1">
-                  {/* Bucket + botón de extensión */}
-                  <ArcherElement id={`bucket-${bucketId}`}>
-                    <div className="flex flex-row items-center bg-gray-100 shadow p-2 relative">
-                      {/* Slots */}
-                      <div className="flex flex-row gap-0.5">
-                        {[...buckets[bucketId], ...Array(4 - buckets[bucketId].length).fill(null)].map((slotValue, index) => (
-                          <Slot
-                            key={index}
-                            bucketId={bucketId}
-                            slotIndex={index}
-                            slotValue={slotValue}
-                            handleDrop={handleDrop}
-                          />
-                        ))}
+                  {/* Contenedor completo del bucket */}
+                  <div className="flex flex-col w-fit space-y-1">
+                    {/* Bucket + botón de extensión */}
+                    <ArcherElement id={`bucket-${bucketId}`}>
+                      <div className="flex flex-row items-center bg-gray-100 shadow p-2 relative">
+                        {/* Slots */}
+                        <div className="flex flex-row gap-0.5">
+                          {filledBucket.map((slotValue, index) => (
+                            <Slot
+                              key={index}
+                              bucketId={bucketId}
+                              slotIndex={index}
+                              slotValue={slotValue}
+                              handleDrop={onDrop}
+                              isDropEnabled={index === firstEmptyIndex}
+                            />
+                          ))}
+                        </div>
+
+                        {/* Botón Extender */}
+                        {isFull && (
+                          <button
+                            onClick={() => extendBucket(bucketId)}
+                            className="ml-2 px-2 h-8 text-sm text-white bg-gray-400 hover:bg-gray-600 rounded"
+                            title="Extender Bucket"
+                          >
+                            →
+                          </button>
+                        )}
                       </div>
+                    </ArcherElement>
 
-                      {/* Botón Extender */}
-                      {buckets[bucketId].length === 4 && !buckets[bucketId].includes(null) && (
+                    {/* Espacio reservado para botón dividir */}
+                    <div
+                      style={{ height: '20px' }}
+                      className="flex justify-center items-center"
+                    >
+                      {isFull && (
                         <button
-                          onClick={() => extendBucket(bucketId)}
-                          className="ml-2 px-2 h-8 text-sm text-white bg-gray-400 hover:bg-gray-600 rounded"
-                          title="Extender Bucket"
+                          onClick={() => splitBucket(bucketId)}
+                          className="w-full text-sm text-white bg-gray-400 hover:bg-gray-600 rounded px-2"
+                          style={{ fontSize: '12px', height: '19px' }}
+                          title="Dividir Bucket"
                         >
-                          →
+                          +
                         </button>
                       )}
                     </div>
-                  </ArcherElement>
-
-                  {/* Espacio reservado para botón dividir */}
-                  <div style={{ height: '20px' }} className="flex justify-center items-center">
-                    {buckets[bucketId].length === 4 && (
-                      <button
-                        onClick={() => splitBucket(bucketId)}
-                        className="w-full text-sm text-white bg-gray-400 hover:bg-gray-600 rounded px-2"
-                        style={{ fontSize: '12px', height: '19px' }}
-                        title="Dividir Bucket"
-                      >
-                        +
-                      </button>
-                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -99,10 +112,10 @@ const HashingZone = ({ buckets, handleDrop, splitBucket, extendBucket }) => {
   );
 };
 
-const Slot = ({ bucketId, slotIndex, slotValue, handleDrop }) => {
+const Slot = ({ bucketId, slotIndex, slotValue, handleDrop, isDropEnabled }) => {
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: 'NODE',
-    canDrop: () => slotValue === null,
+    canDrop: () => slotValue === null && isDropEnabled,
     drop: (item) => handleDrop(bucketId, item.value, slotIndex),
     collect: (monitor) => ({
       isOver: monitor.isOver(),

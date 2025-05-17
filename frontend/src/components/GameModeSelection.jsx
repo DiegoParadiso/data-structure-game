@@ -1,15 +1,19 @@
-// GameModeSelection.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const GameModeSelection = () => {
-  const [mode, setMode] = useState('easy');
-  const [timer, setTimer] = useState('noTimer');
+  const location = useLocation();
   const navigate = useNavigate();
 
+  // Obtenemos el ejercicio desde el estado de la navegación (default 'bst')
+  const exercise = location.state?.exercise || 'bst';
+
+  const [mode, setMode] = useState('easy');
+  const [timer, setTimer] = useState('noTimer');
+
   const handleStartGame = () => {
-    // Pasamos el modo y el temporizador como parte de la URL (o un objeto de estado) para ser usados en el juego.
-    navigate('/ejercicio/bst', { state: { mode, timer } });
+    // Navegamos a la página del ejercicio, pasando mode y timer
+    navigate(`/ejercicio/${exercise}`, { state: { mode, timer } });
   };
 
   return (
