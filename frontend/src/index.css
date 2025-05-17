@@ -2,6 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  @keyframes gradientMove {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .animate-gradient {
+    animation: gradientMove 8s ease infinite;
+  }
+}
+@layer utilities {
+  @keyframes subtleMove {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .bg-subtle {
+    background: linear-gradient(120deg, #f9f9f9, #ffffff, #f0f0f0);
+    background-size: 200% 200%;
+    animation: subtleMove 15s ease infinite;
+  }
+}
 .react-archer-container svg defs marker,
 .react-archer-container svg path marker {
   display: none !important;

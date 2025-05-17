@@ -10,10 +10,13 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center px-4">
+<div className="min-h-screen bg-subtle flex flex-col items-center px-4">
       <div className="mt-10 text-center">
-        <p className="text-base text-gray-700">
-          ¿Listo para el desafío? Resuelve un ejercicio de Estructuras de Datos.
+        <h1 className="text-xl font-bold text-gray-800 pb-2">
+          ¿Listo para el desafío?
+        </h1>
+        <p className=" text-gray-800 pb-3">
+           Resuelve un ejercicio de Estructuras de Datos.
         </p>
       </div>
 
