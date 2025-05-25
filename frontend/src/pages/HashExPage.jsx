@@ -26,53 +26,69 @@ function HashingGame() {
   const [maxNumber, setMaxNumber] = useState(99);
 
   // Calcula la cantidad total de bits necesarios para representar maxNumber
-  const getTotalBits = (max) => {
-    return Math.ceil(Math.log2(max + 1));
-  };
+const getTotalBits = (max) => {
+  if (max == null) {
+    console.error("getTotalBits: max es undefined");
+    return 0;
+  }
+  return Math.ceil(Math.log2(max + 1));
+};
 
-  // Valida si el nodo está correctamente colocado en bucketId según maxNumber
-  const isNodeCorrectlyPlaced = (bucketId, node) => {
-    if (!node || node.decimal === undefined || node.decimal === null) return true;
-    const totalBits = getTotalBits(maxNumber);
-    const binaryValue = node.decimal.toString(2).padStart(totalBits, '0');
+const validateBuckets = (buckets) => {
+  // Verificamos que maxNumber esté definido
+  if (maxNumber == null) {
+    console.error("validateBuckets: maxNumber no está definido");
+    return false;
+  }
+
+  for (const bucketId in buckets) {
+    const bucket = buckets[bucketId];
+    if (!bucket) continue;
+
+    // Ignoramos buckets que estén completamente vacíos
+    if (bucket.every(node => node == null)) continue;
+
     const bucketLength = bucketId.length;
-    const nodeBitsRelevant = binaryValue.slice(-bucketLength);
-    // console.log(`Chequeando nodo ${node.decimal}: bin=${binaryValue}, bucketId=${bucketId}, bitsRelevantes=${nodeBitsRelevant}`);
-    return nodeBitsRelevant === bucketId;
-  };
 
-  const validateBuckets = (buckets) => {
-    for (const bucketId in buckets) {
-      const bucket = buckets[bucketId];
-      if (!bucket) continue;
+    for (const node of bucket) {
+      // Si el slot está vacío, lo saltamos
+      if (node == null) continue;
 
-      // Ignoramos buckets completamente vacíos
-      if (bucket.every(node => node === null || node === undefined)) continue;
+      let number;
+      if (typeof node === 'number') {
+        number = node;
+      } else if (typeof node === 'object' && node.decimal != null) {
+        number = node.decimal;
+      } else {
+        console.log("validateBuckets: Nodo inválido en bucket", bucketId, node);
+        return false;
+      }
 
-      const bucketLength = bucketId.length;
+      const totalBits = getTotalBits(maxNumber);
+      if (totalBits === 0) {
+        console.error("validateBuckets: totalBits es 0");
+        return false;
+      }
 
-      for (const node of bucket) {
-        if (node === null || node === undefined) continue;
-
-        let number;
-        if (typeof node === 'number') {
-          number = node;
-        } else if (node && node.decimal !== undefined) {
-          number = node.decimal;
-        } else {
-          // Nodo sin valor numérico válido
-          return false;
-        }
-
-        const totalBits = getTotalBits(maxNumber);
-        const binaryValue = number.toString(2).padStart(totalBits, '0');
-        const nodeBitsRelevant = binaryValue.slice(-bucketLength);
-
-        if (nodeBitsRelevant !== bucketId) return false;
+      let binaryValue;
+      try {
+        binaryValue = number.toString(2).padStart(totalBits, '0');
+      } catch (e) {
+        console.log("Error al convertir el número a binario:", number, e);
+        return false;
+      }
+      const nodeBitsRelevant = binaryValue.slice(-bucketLength);
+      if (nodeBitsRelevant !== bucketId) {
+        console.log(
+          `Error: Nodo ${number} con binario ${binaryValue} no coincide con bucket ${bucketId} (relevantes: ${nodeBitsRelevant})`
+        );
+        return false;
       }
     }
-    return true;
-  };
+  }
+  return true;
+};
+
 
   useEffect(() => {
     let count = 8;
@@ -81,18 +97,17 @@ function HashingGame() {
       count = 5;
       maxNum = 15;
     } else if (mode === 'hard') {
-      count = 12;
-      maxNum = 15;
+      count = 16;
+      maxNum = 20;
     }
     setMaxNumber(maxNum);
 
     const generated = generateRandomNumbers(count, 0, maxNum).map(num => ({ decimal: num }));
     setAvailable(generated);
 
-    // Inicializar buckets con 4 slots vacíos cada uno
     const initialBuckets = {
-      '0': Array(4).fill(null),
-      '1': Array(4).fill(null),
+      '0': Array(3).fill(null),
+      '1': Array(3).fill(null),
     };
     setBuckets(initialBuckets);
 
@@ -119,37 +134,35 @@ function HashingGame() {
     setMessage('¡Se acabó el tiempo!');
   };
 
-  const handleDrop = (bucketId, value, slotIndex) => {
+const handleDrop = (bucketId, value, slotIndex) => {
   if (isGameOver) return;
-
-  // Validar si el nodo está correctamente ubicado ya que lo acabamos de poner
-  if (!isNodeCorrectlyPlaced(bucketId, value)) {
-    setIsGameOver(true);
-    setGameStatus("fail");
-    setMessage(`Nodo ${value.decimal || value} mal ubicado en bucket ${bucketId}`);
-    return; // salimos para no actualizar buckets con error
-  }
 
   setBuckets(prev => {
     const updatedBucket = [...(prev[bucketId] || [])];
     updatedBucket[slotIndex] = value;
     const newBuckets = { ...prev, [bucketId]: updatedBucket };
 
-    const totalPlaced = Object.values(newBuckets).flat().filter(Boolean).length;
+    // Validación en cada inserción
+    const allCorrect = validateBuckets(newBuckets);
+    if (!allCorrect) {
+      setIsGameOver(true);
+      setGameStatus("fail");
+      setMessage(`Nodo ${value.decimal || value} mal ubicado en bucket ${bucketId}`);
+      return prev;
+    }
 
+    // Validación final si se completaron todos los nodos
+    const totalPlaced = Object.values(newBuckets).flat().filter(Boolean).length;
     if (totalPlaced === available.length) {
-      const allCorrect = validateBuckets(newBuckets);
-      if (allCorrect) {
-        setIsGameOver(true);
+      const allCorrectFinal = validateBuckets(newBuckets);
+      if (allCorrectFinal) {
         setGameStatus("success");
         setMessage('¡Has colocado todos los nodos correctamente!');
       } else {
         setIsGameOver(true);
         setGameStatus("fail");
-        setMessage('Algunos nodos están mal colocados o faltan por colocar.');
+        setMessage('Hay al menos un nodo mal colocado');
       }
-    } else {
-      setMessage('');
     }
 
     return newBuckets;
@@ -158,31 +171,63 @@ function HashingGame() {
   setEnabledIndex(prev => prev + 1);
 };
 
-  const splitBucket = (bucketId) => {
-    setBuckets(prev => {
-      const items = prev[bucketId] || [];
-      // Dividir según par/impar decimal
-      const bucket0Items = items.filter(val => val !== null && val.decimal % 2 === 0);
-      const bucket1Items = items.filter(val => val !== null && val.decimal % 2 !== 0);
+const splitBucket = (bucketId) => {
+  // ✅ Limitar la profundidad global a 3 bits
+  const newDepth = bucketId.length + 1;
+if (newDepth > 3) {
+  extendBucket(bucketId);
+  return;
+}
 
-      // Crear buckets nuevos con 4 slots (rellenados con null si falta)
-      const fillToSize = (arr, size = 4) => {
-        const filled = [...arr];
-        while (filled.length < size) filled.push(null);
-        return filled;
-      };
+  setBuckets(prev => {
+    const items = prev[bucketId] || [];
+    const totalBits = getTotalBits(maxNumber);
 
-      const newKey0 = bucketId + '0';
-      const newKey1 = bucketId + '1';
+    const bucket0Items = [];
+    const bucket1Items = [];
 
-      const newBuckets = { ...prev };
-      delete newBuckets[bucketId];
-      newBuckets[newKey0] = fillToSize(bucket0Items);
-      newBuckets[newKey1] = fillToSize(bucket1Items);
+    for (const val of items) {
+      if (val === null || val === undefined) continue;
 
-      return newBuckets;
-    });
-  };
+      let decimalValue;
+      if (typeof val === 'number') {
+        decimalValue = val;
+      } else if (typeof val === 'object' && typeof val.decimal === 'number') {
+        decimalValue = val.decimal;
+      } else {
+        console.warn("splitBucket: Valor inválido encontrado", val);
+        continue;
+      }
+
+      const binary = decimalValue.toString(2).padStart(totalBits, '0');
+      const nextBitIndex = totalBits - newDepth;
+      const nextBit = binary[nextBitIndex] || '0';
+
+      if (nextBit === '0') {
+        bucket0Items.push(val);
+      } else {
+        bucket1Items.push(val);
+      }
+    }
+
+    const curr = parseInt(bucketId, 2);
+    const newKey0 = curr.toString(2).padStart(newDepth, '0');
+    const newKey1 = (curr + (1 << (newDepth - 1))).toString(2).padStart(newDepth, '0');
+
+const fillToSize = (arr, size = 3) => {
+      const filled = [...arr];
+      while (filled.length < size) filled.push(null);
+      return filled.slice(0, size);
+    };
+
+    const newBuckets = { ...prev };
+    delete newBuckets[bucketId];
+    newBuckets[newKey0] = fillToSize(bucket0Items);
+    newBuckets[newKey1] = fillToSize(bucket1Items);
+
+    return newBuckets;
+  });
+};
 
   const extendBucket = (bucketId) => {
     setBuckets(prev => {
@@ -198,7 +243,23 @@ function HashingGame() {
   const handleGoBack = () => {
     navigate('/');
   };
+useEffect(() => {
+  if (isGameOver || available.length === 0) return;
 
+  const totalPlaced = Object.values(buckets).flat().filter(Boolean).length;
+
+  if (totalPlaced === available.length) {
+    const allCorrect = validateBuckets(buckets);
+    if (allCorrect) {
+      setGameStatus("success");
+      setMessage("¡Has colocado todos los nodos correctamente!");
+    } else {
+      setGameStatus("fail");
+      setIsGameOver(true);
+      setMessage("Hay al menos un nodo mal colocado");
+    }
+  }
+}, [buckets, available.length, isGameOver]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -236,7 +297,7 @@ function HashingGame() {
           <div className="w-full max-w-6xl flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-4">
 
             {/* Panel de nodos */}
-            <div className="flex flex-col w-full md:w-[20%]">
+            <div className="flex flex-col w-full md:w-[25%]">
               <div className="p-2 border rounded bg-gray-50 h-[300px]">
                 <h2 className="font-bold mb-2">Nodos:</h2>
                 <div className="flex flex-wrap justify-center">
