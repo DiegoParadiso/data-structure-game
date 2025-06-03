@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';  // <-- Importa useNavigate
+import { useLocation, useNavigate } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ArcherContainer } from 'react-archer';
@@ -15,7 +15,7 @@ function BSTGame() {
   const { state } = useLocation();
   const { mode = 'normal', timer } = state || {};
 
-  const navigate = useNavigate();  // <-- Aquí creas el navigate
+  const navigate = useNavigate(); 
 
   const [available, setAvailable] = useState([]);
   const [tree, setTree] = useState(null);

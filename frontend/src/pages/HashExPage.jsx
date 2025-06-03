@@ -118,7 +118,7 @@ const validateBuckets = (buckets) => {
   }, [mode]);
 
   useEffect(() => {
-    const timeMapping = { '35s': 35, '20s': 20, '15s': 15 };
+    const timeMapping = { '90s': 90, '60s': 60, '35s': 35 };
     const secondsToAdd = timeMapping[timer] || 0;
 
     if (secondsToAdd > 0) {
@@ -172,7 +172,7 @@ const handleDrop = (bucketId, value, slotIndex) => {
 };
 
 const splitBucket = (bucketId) => {
-  // ✅ Limitar la profundidad global a 3 bits
+  // Limitar la profundidad global a 3 bits
   const newDepth = bucketId.length + 1;
 if (newDepth > 3) {
   extendBucket(bucketId);

@@ -43,35 +43,60 @@ const GameModeSelection = () => {
           </div>
         </div>
 
-        {/* Temporizador */}
         <div className="p-4 border rounded-lg shadow-md">
-          <div>
-            <button
-              onClick={() => setTimer('noTimer')}
-              className={`p-2 w-full ${timer === 'noTimer' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded mb-2`}
-            >
-              Sin Temporizador
-            </button>
-            <button
-              onClick={() => setTimer('35s')}
-              className={`p-2 w-full ${timer === '35s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded mb-2`}
-            >
-              35 segundos
-            </button>
-            <button
-              onClick={() => setTimer('20s')}
-              className={`p-2 w-full ${timer === '20s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded mb-2`}
-            >
-              20 segundos
-            </button>
-            <button
-              onClick={() => setTimer('15s')}
-              className={`p-2 w-full ${timer === '15s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded`}
-            >
-              15 segundos
-            </button>
-          </div>
-        </div>
+  <div>
+    <button
+      onClick={() => setTimer('noTimer')}
+      className={`p-2 w-full ${timer === 'noTimer' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded mb-2`}
+    >
+      Sin Temporizador
+    </button>
+
+    {exercise === 'hashingex' ? (
+      <>
+        <button
+          onClick={() => setTimer('90s')}
+          className={`p-2 w-full ${timer === '90s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded mb-2`}
+        >
+          90 segundos
+        </button>
+        <button
+          onClick={() => setTimer('60s')}
+          className={`p-2 w-full ${timer === '60s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded mb-2`}
+        >
+          60 segundos
+        </button>
+        <button
+          onClick={() => setTimer('35s')}
+          className={`p-2 w-full ${timer === '35s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded`}
+        >
+          35 segundos
+        </button>
+      </>
+    ) : (
+      <>
+        <button
+          onClick={() => setTimer('35s')}
+          className={`p-2 w-full ${timer === '35s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded mb-2`}
+        >
+          35 segundos
+        </button>
+        <button
+          onClick={() => setTimer('20s')}
+          className={`p-2 w-full ${timer === '20s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded mb-2`}
+        >
+          20 segundos
+        </button>
+        <button
+          onClick={() => setTimer('15s')}
+          className={`p-2 w-full ${timer === '15s' ? 'bg-gray-600 text-white' : 'bg-gray-200'} rounded`}
+        >
+          15 segundos
+        </button>
+      </>
+    )}
+  </div>
+</div>
       </div>
 
       <button

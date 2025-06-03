@@ -11,7 +11,7 @@ const HashingZone = ({ buckets, onDrop, splitBucket, extendBucket, globalDepth})
       <div className="flex flex-col items-center w-full">
         <div className="flex flex-row gap-4 items-center pt-10">
           {/* Columna de índices */}
-          <div className="flex flex-col items-center pr-20">
+          <div className="flex flex-col items-center pr-24">
             {indexLabels.map((idx, i) => (
               <ArcherElement
                 key={`index-${idx}`}
