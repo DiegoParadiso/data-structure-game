@@ -148,14 +148,19 @@ const handleDrop = (bucketId, value, slotIndex) => {
       setIsGameOver(true);
       setGameStatus("fail");
       setMessage(`Nodo ${value.decimal || value} mal ubicado en bucket ${bucketId}`);
-      return prev;
+      return prev;  // no actualiza buckets, porque fallo
     }
 
-    // Validación final si se completaron todos los nodos
-    const totalPlaced = Object.values(newBuckets).flat().filter(Boolean).length;
+    // Contar nodos colocados: evitar problemas con valores 0
+    const totalPlaced = Object.values(newBuckets)
+      .flat()
+      .filter(v => v !== null && v !== undefined)
+      .length;
+
     if (totalPlaced === available.length) {
       const allCorrectFinal = validateBuckets(newBuckets);
       if (allCorrectFinal) {
+        setIsGameOver(true);  // para terminar juego
         setGameStatus("success");
         setMessage('¡Has colocado todos los nodos correctamente!');
       } else {
