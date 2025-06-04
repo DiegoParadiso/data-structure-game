@@ -42,7 +42,7 @@ function DraggableNode({ value, isEnabled }) {
         alignItems: 'center',
         fontSize: '1rem',
         backgroundColor: isDragging ? '#e0e0e0' : '#FFFFFF',
-        pointerEvents: isEnabled ? 'auto' : 'none', // 👈 evita arrastre desde mouse/touch
+        pointerEvents: isEnabled ? 'auto' : 'none',
       }}
     >
       {value}

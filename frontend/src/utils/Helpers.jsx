@@ -31,3 +31,21 @@ function generateRandomNumbers(size, min, max) {
   export { generateRandomNumbers };
 
   
+  // Recibe un nodo con {value, left, right} y tipo 'min' o 'max'
+// Retorna true si cumple propiedad heap
+export function isHeap(node, heapType = 'min') {
+  if (!node) return true;
+
+  const left = node.left;
+  const right = node.right;
+
+  if (left) {
+    if (heapType === 'min' && node.value > left.value) return false;
+    if (heapType === 'max' && node.value < left.value) return false;
+  }
+  if (right) {
+    if (heapType === 'min' && node.value > right.value) return false;
+    if (heapType === 'max' && node.value < right.value) return false;
+  }
+  return isHeap(left, heapType) && isHeap(right, heapType);
+}
