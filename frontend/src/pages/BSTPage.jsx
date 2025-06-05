@@ -58,31 +58,57 @@ function BSTGame() {
     setMessage('¡El tiempo se acabó!');
   };
 
-  const handleAddChild = (parentVal, side, childVal) => {
-    if (isGameOver) return;
+const handleAddChild = (parentVal, side, childVal) => {
+  if (isGameOver) return;
 
-    const addNode = (node) => {
-      if (!node) return null;
+  const addNode = (node) => {
+    if (!node) return null;
 
-      if (node.value === parentVal) {
-        if (side === 'left' && !node.left) node.left = { value: childVal, left: null, right: null };
-        if (side === 'right' && !node.right) node.right = { value: childVal, left: null, right: null };
-      } else {
-        node.left && addNode(node.left);
-        node.right && addNode(node.right);
-      }
-      return node;
-    };
-
-    setTree((prev) => addNode({ ...prev }));
-    setEnabledIndex((prev) => prev + 1);
+    if (node.value === parentVal) {
+      if (side === 'left' && !node.left) node.left = { value: childVal, left: null, right: null };
+      if (side === 'right' && !node.right) node.right = { value: childVal, left: null, right: null };
+    } else {
+      node.left && addNode(node.left);
+      node.right && addNode(node.right);
+    }
+    return node;
   };
 
-  const handleAddRoot = (val) => {
-    if (isGameOver) return;
-    setTree({ value: val, left: null, right: null });
-    setEnabledIndex(1);
-  };
+  const updatedTree = addNode({ ...tree });
+  setTree(updatedTree);
+  setEnabledIndex((prev) => prev + 1);
+
+  // Verificar el árbol actualizado
+  const { isValid, errorNode } = isBST(updatedTree);
+  if (!isValid) {
+    setIsGameOver(true);
+    setGameStatus("fail");
+    setMessage('Te equivocaste, ese no es un BST válido.');
+    setErrorNode(errorNode);
+  } else if (enabledIndex + 1 === available.length) {
+    // Si colocaste todos y está bien
+    setIsGameOver(true);
+    setGameStatus("success");
+    setMessage('Has colocado todos los nodos correctamente.');
+  }
+};
+
+const handleAddRoot = (val) => {
+  if (isGameOver) return;
+
+  const newTree = { value: val, left: null, right: null };
+  setTree(newTree);
+  setEnabledIndex(1);
+
+  // Validar después de colocar la raíz
+  const { isValid, errorNode } = isBST(newTree);
+  if (!isValid) {
+    setIsGameOver(true);
+    setGameStatus("fail");
+    setMessage('Has colocado un nodo inválido');
+    setErrorNode(errorNode);
+  }
+};
 
   const handleVerify = () => {
     const { isValid, errorNode } = isBST(tree);
