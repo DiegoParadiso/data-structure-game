@@ -46,7 +46,7 @@ const Home = () => {
           onClick={() => navigate('/ejercicio/heap', { state: { exercise: 'heap' } })}        >
           <img src={assets.arbol} alt="Árboles n-arios" className="w-14 h-14" />
           <p className="text-sm text-center font-medium text-gray-800">
-            Árboles n-arios
+            Max-Heap y Min-Heap
           </p>
         </div>
 
