@@ -3,8 +3,7 @@ import DraggableDroppableNode from './DraggableDroppableNode';
 import { ArcherElement } from 'react-archer';
 import { useDrop } from 'react-dnd';
 
-function TreeNodeHeap({ node, onSwapValues, isGameOver }) {
-  // Llamamos useDrop siempre, evitando errores cuando node sea null:
+function TreeNodeHeap({ node, onSwapValues, isGameOver, hiddenNodeIds = new Set(), mode = 'easy' }) {
   const [{ canDrop, isOver }, drop] = useDrop({
     accept: 'NODE',
     drop: (item) => {
@@ -19,26 +18,34 @@ function TreeNodeHeap({ node, onSwapValues, isGameOver }) {
     }),
   });
 
-  if (!node) return null;  // ahora después de llamar al hook
+  if (!node) return null;
 
+  // Filtramos solo hijos válidos
+  const validLeft = node.left && node.left.id ? node.left : null;
+  const validRight = node.right && node.right.id ? node.right : null;
+
+  // Construimos las relaciones solo para hijos visibles
   const relations = [];
-  if (node.left) {
+  if (validLeft) {
     relations.push({
-      targetId: node.left.id,
+      targetId: validLeft.id,
       targetAnchor: 'top',
       sourceAnchor: 'bottom',
       style: { endMarker: false },
     });
   }
-  if (node.right) {
+  if (validRight) {
     relations.push({
-      targetId: node.right.id,
+      targetId: validRight.id,
       targetAnchor: 'top',
       sourceAnchor: 'bottom',
       style: { endMarker: false },
     });
   }
-  
+
+  // Si modo 'hard' y el nodo está oculto, mostramos '?'
+  const displayValue = mode === 'hard' && hiddenNodeIds.has(node.id) ? '?' : node.value;
+
   return (
     <div className="relative flex flex-col items-center">
       <ArcherElement id={node.id} relations={relations}>
@@ -52,14 +59,36 @@ function TreeNodeHeap({ node, onSwapValues, isGameOver }) {
             boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
           }}
         >
-          <DraggableDroppableNode id={node.id} value={node.value} onSwapValues={onSwapValues} isGameOver={isGameOver} />
+          <DraggableDroppableNode
+            id={node.id}
+            value={displayValue}
+            onSwapValues={onSwapValues}
+            isGameOver={isGameOver}
+          />
         </div>
       </ArcherElement>
       <div className="flex gap-8">
-        <TreeNodeHeap node={node.left} onSwapValues={onSwapValues} isGameOver={isGameOver} />
-        <TreeNodeHeap node={node.right} onSwapValues={onSwapValues} isGameOver={isGameOver} />
+        {validLeft && (
+          <TreeNodeHeap
+            node={validLeft}
+            onSwapValues={onSwapValues}
+            isGameOver={isGameOver}
+            hiddenNodeIds={hiddenNodeIds}
+            mode={mode}
+          />
+        )}
+        {validRight && (
+          <TreeNodeHeap
+            node={validRight}
+            onSwapValues={onSwapValues}
+            isGameOver={isGameOver}
+            hiddenNodeIds={hiddenNodeIds}
+            mode={mode}
+          />
+        )}
       </div>
     </div>
   );
 }
+
 export default TreeNodeHeap;

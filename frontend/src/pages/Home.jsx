@@ -43,7 +43,8 @@ const Home = () => {
         {/* Box 3 */}
         <div
           className="font-mono bg-white/90 backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300 rounded-2xl px-5 py-6 flex flex-col justify-between items-center h-52 cursor-pointer"
-          onClick={() => navigate('/ejercicio/heap', { state: { exercise: 'heap' } })}        >
+                    onClick={() => navigate('/ejercicio/seleccion', { state: { exercise: 'heap' } })}
+        >
           <img src={assets.arbol} alt="Árboles n-arios" className="w-14 h-14" />
           <p className="text-sm text-center font-medium text-gray-800">
             Max-Heap y Min-Heap
