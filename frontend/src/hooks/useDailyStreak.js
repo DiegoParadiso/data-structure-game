@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 const getTodayDate = () => new Date().toISOString().split('T')[0];
-const DEBUG_DISABLE_LIMIT = true;
+const DEBUG_DISABLE_LIMIT = false;
 
 export default function useDailyStreak(gameKey) {
   const [canPlay, setCanPlay] = useState(true);
