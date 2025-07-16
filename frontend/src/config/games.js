@@ -8,7 +8,7 @@ export const gamesConfig = {
     state: {
       mode: 'normal',
       timer: 60,
-      heapType: null, // no aplica
+      heapType: null, 
     },
   },
   hashingex: {

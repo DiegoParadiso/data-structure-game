@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDragLayer } from 'react-dnd';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
-function CustomDragLayer() {
+function CustomDragLayer({ showPreview = true }) {
   const { item, isDragging, currentOffset } = useDragLayer((monitor) => ({
     item: monitor.getItem(),
     isDragging: monitor.isDragging(),
@@ -22,7 +22,7 @@ function CustomDragLayer() {
     }
   }, [currentOffset]);
 
-  if (!isDragging || !currentOffset) return null;
+  if (!isDragging || !currentOffset || !showPreview) return null;
 
   return (
     <motion.div

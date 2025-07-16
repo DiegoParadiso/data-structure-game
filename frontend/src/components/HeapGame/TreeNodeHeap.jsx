@@ -20,11 +20,9 @@ function TreeNodeHeap({ node, onSwapValues, isGameOver, hiddenNodeIds = new Set(
 
   if (!node) return null;
 
-  // Filtramos solo hijos válidos
   const validLeft = node.left && node.left.id ? node.left : null;
   const validRight = node.right && node.right.id ? node.right : null;
 
-  // Construimos las relaciones solo para hijos visibles
   const relations = [];
   if (validLeft) {
     relations.push({
@@ -43,7 +41,6 @@ function TreeNodeHeap({ node, onSwapValues, isGameOver, hiddenNodeIds = new Set(
     });
   }
 
-  // Si modo 'hard' y el nodo está oculto, mostramos '?'
   const displayValue = mode === 'hard' && hiddenNodeIds.has(node.id) ? '?' : node.value;
 
   return (
@@ -51,11 +48,9 @@ function TreeNodeHeap({ node, onSwapValues, isGameOver, hiddenNodeIds = new Set(
       <ArcherElement id={node.id} relations={relations}>
         <div
           ref={drop}
-          className="flex items-center justify-center border-2 rounded-full cursor-pointer select-none"
+          className="flex items-center justify-center border-2 rounded-full cursor-pointer select-none
+            w-8 h-8 mb-3 md:w-12 md:h-12 md:mb-4"
           style={{
-            width: '48px',
-            height: '48px',
-            marginBottom: '16px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
           }}
         >
@@ -67,7 +62,8 @@ function TreeNodeHeap({ node, onSwapValues, isGameOver, hiddenNodeIds = new Set(
           />
         </div>
       </ArcherElement>
-      <div className="flex gap-8">
+      <div className="flex gap-4 px-2 max-w-full">
+        {/* Quité overflow-x-auto de acá */}
         {validLeft && (
           <TreeNodeHeap
             node={validLeft}
