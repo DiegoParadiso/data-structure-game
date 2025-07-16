@@ -1,42 +1,37 @@
 # Data Structure Game
 
-A fun and progressive way to learn and reinforce core data structures like **binary trees**, **hash tables**, **graphs**, and more through visual and practical exercises.
+Una forma distinta de aprender y reforzar estructuras de datos como **árboles binarios (BST)**, **hash extensible**, **montículos (Max-Heap/Min-Heap)** y más, mediante ejercicios visuales y prácticos con sistema de Streaks.
 
 ## Game Modules
 
-### Binary Trees
-- Build trees from given sequences.
-- Verify properties (BST, AVL, etc.).
-- Solve challenges like finding common ancestors, calculating depth, etc.
+### Binary Trees (BST)  
+- Construcción y manipulación de árboles binarios de búsqueda.  
+- Verificación de propiedades BST.
 
-### Hash Tables
-- Insert values using different hashing functions.
-- Handle collisions (open addressing, chaining).
-- Simulate collision attacks and optimization techniques.
+### Hash Tables (Extensible Hashing)  
+- Inserción de valores binarios usando hashing extensible.  
+- Manejo de colisiones y optimizaciones.
 
-### Linked Lists *(coming soon)*
-- Visualize insertions, deletions, and searches.
-- Challenges like detecting cycles or sorting lists.
+### Heaps (Max-Heap / Min-Heap)  
+- Construcción y verificación de montículos máximos y mínimos.
 
-### Daily Challenges *(coming soon)*
-- A new exercise every day.
-- Point system, limited attempts, and player stats.
-- Practice mode for reviewing previous topics.
+### Daily Challenges  
+- Ejercicios implementados con sistema de rachas y seguimiento del progreso.  
 
 ## Tech Stack
-- **Frontend**: React + Tailwind CSS
-- **Mechanics**: React DnD / custom drag-and-drop
-- **Backend** *(in progress)*: Node.js + MongoDB
-- **Authentication** *(in progress)*: JWT-based user progress tracking
-- **Graphics**: Dynamic visual representations of trees and structures
+- **Frontend**: React + Tailwind CSS  
+- **Mecánicas**: React DnD / drag-and-drop personalizado  
+- **Backend** *(en progreso)*: Node.js + MongoDB  
+- **Autenticación** *(en progreso)*: JWT para seguimiento de progreso de usuarios  
+- **Gráficos**: Representaciones dinámicas de árboles y estructuras  
 
-## 🚀 Who is this for?
-- Computer science students
-- Algorithm enthusiasts
-- Coding competition participants (e.g. interviews, Olympiads)
-- Educators seeking engaging teaching tools
+## ¿Para quién es?  
+- Estudiantes de ciencias de la computación  
+- Entusiastas de algoritmos  
+- Participantes de competencias de programación (entrevistas, olimpiadas)  
+- Educadores que buscan herramientas interactivas para enseñar  
 
-## 🚧 How to Run Locally
-1. Clone the repository:
+## Cómo ejecutar localmente  
+1. Clonar el repositorio:  
    ```bash
    git clone https://github.com/DiegoParadiso/data-structure-game.git
