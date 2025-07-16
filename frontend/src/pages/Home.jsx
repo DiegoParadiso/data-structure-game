@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { assets } from '../assets/assets';
+import { gamesConfig } from '../config/games';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const Home = () => {
     return data[gameKey]?.streak || 0;
   };
 
-  const renderCard = (gameKey, label, IconComponent, route) => {
+  const renderCard = (gameKey, { label, icon: IconComponent, route, state }) => {
     const locked = hasPlayedToday(gameKey);
     const streak = getStreak(gameKey);
 
@@ -30,7 +30,9 @@ const Home = () => {
         className={`relative bg-white shadow-sm ${
           locked ? 'opacity-40 cursor-not-allowed' : 'hover:shadow-md cursor-pointer'
         } transition rounded-xl px-4 py-6 flex flex-col items-center justify-between h-36`}
-        onClick={() => !locked && navigate(route, { state: { exercise: gameKey } })}
+        onClick={() =>
+          !locked && navigate(route, { state: { exercise: gameKey, ...state } })
+        }
       >
         {streak > 0 && (
           <div className="absolute top-2 right-2 bg-neutral-200 text-neutral-700 text-xs rounded-full px-2 py-[2px] flex items-center gap-1 shadow-sm">
@@ -41,9 +43,7 @@ const Home = () => {
           </div>
         )}
 
-        {/* Renderiza el SVG como componente */}
         <IconComponent className="w-12 h-12 opacity-90 text-gray-700" />
-
         <p className="text-sm text-center text-gray-700 font-medium">
           {label}
           {locked && <span className="block text-xs text-red-500 mt-1">Vuelve Mañana</span>}
@@ -60,9 +60,7 @@ const Home = () => {
       </header>
 
       <main className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-2xl">
-        {renderCard('bst', 'Árbol Binario de Búsqueda', assets.BST, '/ejercicio/seleccion')}
-        {renderCard('hashingex', 'Hash Extensible', assets.Hash, '/ejercicio/seleccion')}
-        {renderCard('heapgame', 'Max-Heap y Min-Heap', assets.Heap, '/ejercicio/seleccion')}
+        {Object.entries(gamesConfig).map(([gameKey, config]) => renderCard(gameKey, config))}
 
         {[...Array(3)].map((_, i) => (
           <div

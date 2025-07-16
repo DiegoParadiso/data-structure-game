@@ -11,10 +11,15 @@ const GameModeSelection = () => {
   const [mode, setMode] = useState('easy');
   const [timer, setTimer] = useState('noTimer');
 
-  const handleStartGame = () => {
-    // Navegamos a la página del ejercicio, pasando mode y timer
-    navigate(`/ejercicio/${exercise}`, { state: { mode, timer } });
-  };
+const handleStartGame = () => {
+  navigate(`/ejercicio/${exercise}`, {
+    state: {
+      ...location.state, 
+      mode,
+      timer,
+    },
+  });
+};
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center px-4">
@@ -73,7 +78,7 @@ const GameModeSelection = () => {
       35 segundos
     </button>
   </>
-) : exercise === 'heap' ? (
+) : exercise === 'heapgame' ? (
   <>
     <button
       onClick={() => setTimer('40s')}

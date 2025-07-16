@@ -4,12 +4,12 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ArcherContainer } from 'react-archer';
 
-import DraggableNode from '../components/DraggableNode';
-import DropZone from '../components/DropZone';
-import TreeNode from '../components/TreeNode';
-import CustomDragLayer from '../components/CustomDragLayer';
+import DraggableNode from '../components/common/DraggableNode';
+import DropZone from '../components/BstGame/DropZone';
+import TreeNode from '../components/BstGame/TreeNode';
+import CustomDragLayer from '../components/common/CustomDragLayer';
 import useBSTGame from '../hooks/useBSTGame';
-import HeaderGame from '../components/Header'; 
+import HeaderGame from '../components/common/Header'; 
 
 function BSTGame() {
   const { state } = useLocation();

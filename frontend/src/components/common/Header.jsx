@@ -1,5 +1,5 @@
 import React from 'react';
-import Timer from './Timer'; // IMPORTANTE: importa Timer aquí
+import Timer from '../Timer'; // IMPORTANTE: importa Timer aquí
 
 export default function HeaderGame({ onGoBack, expiryTimestamp, onTimeUp, stopTimer, streak }) {
   return (

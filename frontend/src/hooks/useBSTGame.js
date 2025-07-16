@@ -1,28 +1,29 @@
 import { useState, useEffect } from 'react';
 import { generateRandomNumbers, isBST } from '../utils/Helpers';
-import useDailyStreak from './useDailyStreak';
 import { addNodeToTree, createRootNode } from '../utils/bstHelpers';
-import { useTimerSetup } from './useTimerSetup';
+import useDailyGameBase from './useDailyGameBase';
 
 export default function useBSTGame({ mode = 'normal', timer, updateResult }) {
+  // Uso hook base para estados comunes y streak
+  const {
+    message,
+    setMessage,
+    enabledIndex,
+    setEnabledIndex,
+    isGameOver,
+    setIsGameOver,
+    gameStatus,
+    setGameStatus,
+    streak,
+    expiryTimestamp,
+    updateResults,
+  } = useDailyGameBase('bst', timer, updateResult);
+
   const [available, setAvailable] = useState([]);
   const [tree, setTree] = useState(null);
-  const [message, setMessage] = useState('');
-  const [enabledIndex, setEnabledIndex] = useState(0);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [gameStatus, setGameStatus] = useState(null);
   const [errorNode, setErrorNode] = useState(null);
 
-  const { canPlay, streak } = useDailyStreak('bst');
-  const expiryTimestamp = useTimerSetup(timer);
-
-  useEffect(() => {
-    if (!canPlay) {
-      setIsGameOver(true);
-      setMessage('Ya jugaste hoy. ¡Volvé mañana!');
-    }
-  }, [canPlay]);
-
+  // Inicializa números disponibles según modo
   useEffect(() => {
     let count = 8;
     if (mode === 'easy') count = 5;
@@ -35,7 +36,7 @@ export default function useBSTGame({ mode = 'normal', timer, updateResult }) {
     setIsGameOver(true);
     setGameStatus('fail');
     setMessage('¡El tiempo se acabó!');
-    updateResult(false);
+    updateResults(false);
   };
 
   const handleAddChild = (parentVal, side, childVal) => {
@@ -51,12 +52,12 @@ export default function useBSTGame({ mode = 'normal', timer, updateResult }) {
       setGameStatus('fail');
       setMessage('Te equivocaste, ese no es un BST válido.');
       setErrorNode(errorNode);
-      updateResult(false);
+      updateResults(false);
     } else if (enabledIndex + 1 === available.length) {
       setIsGameOver(true);
       setGameStatus('success');
       setMessage('¡Todos los nodos colocados correctamente!');
-      updateResult(true);
+      updateResults(true);
     }
   };
 
@@ -72,7 +73,7 @@ export default function useBSTGame({ mode = 'normal', timer, updateResult }) {
       setGameStatus('fail');
       setMessage('Has colocado un nodo inválido');
       setErrorNode(errorNode);
-      updateResult(false);
+      updateResults(false);
     }
   };
 
@@ -82,7 +83,7 @@ export default function useBSTGame({ mode = 'normal', timer, updateResult }) {
     setGameStatus(isValid ? 'success' : 'fail');
     setMessage(isValid ? '¡El árbol es correcto!' : 'El árbol NO es un BST correcto.');
     if (!isValid) setErrorNode(errorNode);
-    updateResult(isValid);
+    updateResults(isValid);
   };
 
   return {

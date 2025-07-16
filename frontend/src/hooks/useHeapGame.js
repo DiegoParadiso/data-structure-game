@@ -1,8 +1,21 @@
 import { useState, useEffect } from 'react';
 import { generateRandomNumbers, isHeap } from '../utils/Helpers';
-import useDailyStreak from './useDailyStreak';
+import useDailyGameBase from './useDailyGameBase';
 
 export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateResult }) {
+  // Hook base para estados comunes
+  const {
+    message,
+    setMessage,
+    isGameOver,
+    setIsGameOver,
+    gameStatus,
+    setGameStatus,
+    streak,
+    expiryTimestamp,
+    updateResults,
+  } = useDailyGameBase('heapgame', timer, updateResult);
+
   const [heapType, setHeapType] = useState(() => {
     if (heapTypeFromState === 'min' || heapTypeFromState === 'max') return heapTypeFromState;
     return Math.random() < 0.5 ? 'min' : 'max';
@@ -10,32 +23,15 @@ export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateR
 
   const [tree, setTree] = useState(null);
   const [hiddenNodeIds, setHiddenNodeIds] = useState(new Set());
-  const [expiryTimestamp, setExpiryTimestamp] = useState(null);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [message, setMessage] = useState('');
-  const [gameStatus, setGameStatus] = useState(null);
-
-  const { canPlay, streak, updateResult: updateStreakResult } = useDailyStreak('heapgame');
 
   useEffect(() => {
-    if (!canPlay) {
-      setIsGameOver(true);
-      setMessage('Ya jugaste hoy. ¡Volvé mañana!');
-    }
-  }, [canPlay]);
-
-  // Inicializar árbol y nodos ocultos
-  useEffect(() => {
+    if (isGameOver) return; // evita reiniciar si juego terminado
     let nNodes = 15;
     if (mode === 'easy') nNodes = 10;
     else if (mode === 'hard') nNodes = 20;
 
     const nodes = generateRandomNumbers(nNodes, 1, 99);
-
-    let sortedNodes;
-    if (heapType === 'min') sortedNodes = [...nodes].sort((a, b) => a - b);
-    else sortedNodes = [...nodes].sort((a, b) => b - a);
-
+    let sortedNodes = heapType === 'min' ? [...nodes].sort((a, b) => a - b) : [...nodes].sort((a, b) => b - a);
     const shuffled = [...sortedNodes].sort(() => Math.random() - 0.5);
 
     const createNodeWithIndex = (index) => {
@@ -48,36 +44,23 @@ export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateR
       };
     };
 
-    const heapTree = createNodeWithIndex(0);
-    setTree(heapTree);
+    setTree(createNodeWithIndex(0));
 
     if (mode === 'hard') {
       const nHidden = Math.min(2, Math.max(1, Math.floor(nNodes * 0.2)));
       const indices = Array.from({ length: nNodes }, (_, i) => i);
       const shuffledIndices = indices.sort(() => Math.random() - 0.5);
-      const hiddenIdsSet = new Set(shuffledIndices.slice(0, nHidden).map(i => `node-${i}`));
-      setHiddenNodeIds(hiddenIdsSet);
+      setHiddenNodeIds(new Set(shuffledIndices.slice(0, nHidden).map(i => `node-${i}`)));
     } else {
       setHiddenNodeIds(new Set());
     }
-  }, [mode, heapType]);
-
-  useEffect(() => {
-    if (!timer) return;
-    const secondsToAdd = parseInt(timer, 10);
-    if (secondsToAdd > 0) {
-      const expiry = new Date();
-      expiry.setSeconds(expiry.getSeconds() + secondsToAdd);
-      setExpiryTimestamp(expiry);
-    }
-  }, [timer]);
+  }, [mode, heapType, isGameOver]);
 
   const handleTimeUp = () => {
     setIsGameOver(true);
     setGameStatus("fail");
     setMessage('¡El tiempo se acabó!');
-    updateStreakResult(false);
-    updateResult(false);
+    updateResults(false);
   };
 
   const areParentAndChild = (node, sourceId, targetId) => {
@@ -143,12 +126,12 @@ export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateR
     setIsGameOver(true);
     setGameStatus(valid ? "success" : "fail");
     setMessage(valid ? '¡El árbol cumple la propiedad heap!' : 'El árbol NO cumple la propiedad heap.');
-    updateStreakResult(valid);
-    updateResult(valid);
+    updateResults(valid);
   };
 
   return {
     heapType,
+    setHeapType,
     tree,
     hiddenNodeIds,
     expiryTimestamp,
@@ -156,7 +139,6 @@ export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateR
     message,
     gameStatus,
     streak,
-    setHeapType,
     handleTimeUp,
     handleSwapValues,
     handleVerify,

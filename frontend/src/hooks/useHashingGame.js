@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { generateRandomNumbers } from '../utils/Helpers';
-import useDailyStreak from './useDailyStreak';
+import useDailyGameBase from './useDailyGameBase';
 import { validateBuckets, splitBucketHelper, extendBucketHelper } from './useBucketManager';
-import { useTimerSetup } from './useTimerSetup';
 
 const modeConfigs = {
   normal: { count: 8, maxNum: 15 },
@@ -10,29 +9,25 @@ const modeConfigs = {
   hard: { count: 16, maxNum: 20 },
 };
 
-export default function useHashingGame({ mode = 'normal', timer }) {
+export default function useHashingGame({ mode = 'normal', timer, updateResult }) {
+  const {
+    message,
+    setMessage,
+    enabledIndex,
+    setEnabledIndex,
+    isGameOver,
+    setIsGameOver,
+    gameStatus,
+    setGameStatus,
+    streak,
+    expiryTimestamp,
+    updateResults,
+  } = useDailyGameBase('hashingex', timer, updateResult);
+
   const [available, setAvailable] = useState([]);
   const [buckets, setBuckets] = useState({ '0': [], '1': [] });
-  const [message, setMessage] = useState('');
-  const [enabledIndex, setEnabledIndex] = useState(0);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [gameStatus, setGameStatus] = useState(null);
   const [maxNumber, setMaxNumber] = useState(99);
 
-  const { canPlay, streak, updateResult } = useDailyStreak('hashingex');
-
-  // Timer hook maneja expiryTimestamp
-  const expiryTimestamp = useTimerSetup(timer);
-
-  // Bloquea si ya jugó hoy
-  useEffect(() => {
-    if (!canPlay) {
-      setIsGameOver(true);
-      setMessage('Ya jugaste hoy. ¡Volvé mañana!');
-    }
-  }, [canPlay]);
-
-  // Configura dificultad y reinicia estado
   useEffect(() => {
     const { count, maxNum } = modeConfigs[mode] || modeConfigs.normal;
     setMaxNumber(maxNum);
@@ -48,7 +43,7 @@ export default function useHashingGame({ mode = 'normal', timer }) {
     setIsGameOver(true);
     setGameStatus('fail');
     setMessage('¡Se acabó el tiempo!');
-    updateResult(false);
+    updateResults(false);
   };
 
   const handleDrop = (bucketId, value, slotIndex) => {
@@ -62,7 +57,7 @@ export default function useHashingGame({ mode = 'normal', timer }) {
         setIsGameOver(true);
         setGameStatus('fail');
         setMessage(`Nodo ${value.decimal || value} mal ubicado en bucket ${bucketId}`);
-        updateResult(false);
+        updateResults(false);
         return prev;
       }
 
@@ -74,7 +69,7 @@ export default function useHashingGame({ mode = 'normal', timer }) {
         setIsGameOver(true);
         setGameStatus('success');
         setMessage('¡Has colocado todos los nodos correctamente!');
-        updateResult(true);
+        updateResults(true);
       }
 
       return newBuckets;

@@ -4,10 +4,10 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ArcherContainer } from 'react-archer';
 
-import DraggableNode from '../components/DraggableNode';
-import HashingZone from '../components/HashingZone';
-import CustomDragLayer from '../components/CustomDragLayer';
-import HeaderGame from '../components/Header'; // usa el header con Timer importado
+import DraggableNode from '../components/common/DraggableNode';
+import HashingZone from '../components/HashGame/HashingZone';
+import CustomDragLayer from '../components/common/CustomDragLayer';
+import HeaderGame from '../components/common/Header'; 
 import useHashingGame from '../hooks/useHashingGame';
 
 function HashingGame() {

@@ -3,10 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import CustomDragLayer from '../components/CustomDragLayer';
-import HeaderGame from '../components/Header'; 
-import HeapAvailableNodes from '../components/HeapAvailableNodes';
-import HeapTreeContainer from '../components/HeapTreeContainer';
+import CustomDragLayer from '../components/common/CustomDragLayer';
+import HeaderGame from '../components/common/Header'; 
+import HeapAvailableNodes from '../components/HeapGame/HeapAvailableNodes';
+import HeapTreeContainer from '../components/HeapGame/HeapTreeContainer';
 
 import { useHeapGame } from '../hooks/useHeapGame';
 

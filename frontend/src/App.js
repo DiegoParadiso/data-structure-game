@@ -16,7 +16,7 @@ function App() {
         <Route path='/ejercicio/seleccion' element={<GameModeSelection />} />
         <Route path='/ejercicio/bst' element={<BSTPage />} />
         <Route path='/ejercicio/hashingex' element={<HashExPage />} />
-        <Route path="/ejercicio/heap" element={<HeapGame />} />
+        <Route path="/ejercicio/heapgame" element={<HeapGame />} />
       </Routes>
     </Router>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import DraggableDroppableNode from './DraggableDroppableNode';
+import DraggableDroppableNode from '../DraggableDroppableNode';
 import { ArcherElement } from 'react-archer';
 import { useDrop } from 'react-dnd';
 
