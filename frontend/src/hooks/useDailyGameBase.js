@@ -19,7 +19,7 @@ export default function useDailyGameBase(gameKey, timer, updateResultExternal) {
   useEffect(() => {
     if (!canPlay) {
       setIsGameOver(true);
-      setMessage('Ya jugaste hoy. ¡Volvé mañana!');
+      setMessage('Ya has jugado ¡Volvé mañana!');
     }
   }, [canPlay]);
 

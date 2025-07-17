@@ -28,7 +28,7 @@ export const gamesConfig = {
     state: {
       mode: 'normal',
       timer: 60,
-      heapType: 'max',
+      heapType: null,
     },
   },
 };

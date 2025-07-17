@@ -3,7 +3,6 @@ import { generateRandomNumbers, isHeap } from '../utils/Helpers';
 import useDailyGameBase from './useDailyGameBase';
 
 export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateResult }) {
-  // Hook base para estados comunes
   const {
     message,
     setMessage,
@@ -16,8 +15,11 @@ export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateR
     updateResults,
   } = useDailyGameBase('heapgame', timer, updateResult);
 
+  // Determina aleatoriamente min o max solo si no viene uno válido
   const [heapType, setHeapType] = useState(() => {
-    if (heapTypeFromState === 'min' || heapTypeFromState === 'max') return heapTypeFromState;
+    if (heapTypeFromState === 'min' || heapTypeFromState === 'max') {
+      return heapTypeFromState;
+    }
     return Math.random() < 0.5 ? 'min' : 'max';
   });
 
@@ -25,13 +27,16 @@ export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateR
   const [hiddenNodeIds, setHiddenNodeIds] = useState(new Set());
 
   useEffect(() => {
-    if (isGameOver) return; // evita reiniciar si juego terminado
+    if (isGameOver) return;
+
     let nNodes = 15;
     if (mode === 'easy') nNodes = 10;
     else if (mode === 'hard') nNodes = 20;
 
     const nodes = generateRandomNumbers(nNodes, 1, 99);
-    let sortedNodes = heapType === 'min' ? [...nodes].sort((a, b) => a - b) : [...nodes].sort((a, b) => b - a);
+    const sortedNodes = heapType === 'min'
+      ? [...nodes].sort((a, b) => a - b)
+      : [...nodes].sort((a, b) => b - a);
     const shuffled = [...sortedNodes].sort(() => Math.random() - 0.5);
 
     const createNodeWithIndex = (index) => {
@@ -54,6 +59,7 @@ export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateR
     } else {
       setHiddenNodeIds(new Set());
     }
+
   }, [mode, heapType, isGameOver]);
 
   const handleTimeUp = () => {
@@ -65,15 +71,20 @@ export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateR
 
   const areParentAndChild = (node, sourceId, targetId) => {
     if (!node) return false;
+
     const leftMatch = node.left && (
       (node.id === sourceId && node.left.id === targetId) ||
       (node.id === targetId && node.left.id === sourceId)
     );
+
     const rightMatch = node.right && (
       (node.id === sourceId && node.right.id === targetId) ||
       (node.id === targetId && node.right.id === sourceId)
     );
-    return leftMatch || rightMatch || areParentAndChild(node.left, sourceId, targetId) || areParentAndChild(node.right, sourceId, targetId);
+
+    return leftMatch || rightMatch ||
+      areParentAndChild(node.left, sourceId, targetId) ||
+      areParentAndChild(node.right, sourceId, targetId);
   };
 
   const handleSwapValues = (sourceId, targetId) => {
@@ -95,12 +106,16 @@ export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateR
       const findAndSwap = (node) => {
         if (!node) return [null, null];
         let source = null, target = null;
+
         if (node._swapMarker === 'source') source = node;
         if (node._swapMarker === 'target') target = node;
+
         const [leftS, leftT] = findAndSwap(node.left);
         const [rightS, rightT] = findAndSwap(node.right);
+
         source = source || leftS || rightS;
         target = target || leftT || rightT;
+
         return [source, target];
       };
 
@@ -115,8 +130,8 @@ export function useHeapGame({ mode = 'normal', heapTypeFromState, timer, updateR
         cleanMarkers(node.left);
         cleanMarkers(node.right);
       };
-      cleanMarkers(newTree);
 
+      cleanMarkers(newTree);
       return newTree;
     });
   };

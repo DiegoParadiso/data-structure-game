@@ -4,7 +4,7 @@ import { gamesConfig } from '../config/games';
 
 const Home = () => {
   const navigate = useNavigate();
-  const DEBUG_DISABLE_LIMIT = false;
+  const DEBUG_DISABLE_LIMIT = true;
 
   const getDailyData = () => JSON.parse(localStorage.getItem('dailyProgress')) || {};
 

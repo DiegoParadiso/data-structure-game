@@ -7,7 +7,7 @@ export function useTimerSetup(timer) {
     let secondsToAdd = 0;
 
     if (typeof timer === 'string') {
-      // Match strings como '90s', '25s', etc.
+      // Match strings
       const match = timer.match(/^(\d+)s$/);
       if (match) {
         secondsToAdd = parseInt(match[1], 10);

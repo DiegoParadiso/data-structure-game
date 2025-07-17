@@ -10,7 +10,7 @@ export default function HeapTreeContainer({ tree, onSwapValues, isGameOver, hidd
       </h2>
 
       {/* Scroll horizontal SOLO en móviles */}
-      <div className="w-full overflow-x-auto md:overflow-x-hidden" style={{ minHeight: '400px' }}>
+      <div className="pt-10 w-full overflow-x-auto md:overflow-x-hidden" style={{ minHeight: '400px' }}>
         <div style={{ minWidth: '600px' /* ancho fijo para que el scroll funcione */ }}>
           <ArcherContainer strokeColor="gray" strokeWidth={2}>
             {tree && (
