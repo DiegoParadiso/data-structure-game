@@ -70,18 +70,22 @@ function BSTGame() {
               )}
             </div>
 
-            <div className="w-full md:w-[80%] p-2 border rounded bg-gray-50 min-h-[500px]">
-              <h2 className="font-bold mb-2">Construcción del árbol:</h2>
-              <div className="flex justify-center">
-                <ArcherContainer strokeColor="gray" strokeWidth={2}>
-                  {tree ? (
-                    <TreeNode node={tree} onAddChild={handleAddChild} />
-                  ) : (
-                    <DropZone onDrop={handleAddRoot} isEnabled={!isGameOver} />
-                  )}
-                </ArcherContainer>
-              </div>
-            </div>
+            <div className="w-full md:w-[80%] p-2 border rounded bg-gray-50 min-h-[500px] flex flex-col">
+  <h2 className="font-bold mb-2">Construcción del árbol:</h2>
+
+  {/* Scroll horizontal solo en móvil */}
+<div className="w-full overflow-x-auto md:overflow-visible px-4 md:px-0">
+  <div className="flex justify-center min-w-[600px] md:min-w-0">
+    <ArcherContainer strokeColor="gray" strokeWidth={2}>
+      {tree ? (
+        <TreeNode node={tree} onAddChild={handleAddChild} errorNode={errorNode} />
+      ) : (
+        <DropZone onDrop={handleAddRoot} isEnabled={!isGameOver} />
+      )}
+    </ArcherContainer>
+  </div>
+</div>
+</div>
           </div>
         </div>
       </div>
